@@ -23,8 +23,14 @@ func CreatePatient(c *gin.Context) {
 		return
 	}
 
-	models.
-		c.JSON(http.StatusOK, gin.H{
+	err := models.DB.Model(&models.Patient{}).Create(&patient).Error
+
+	if err != nil {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{
+			"error": err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
 		"message": "Created Successfully",
 		"data":    patient,
 	})
