@@ -33,5 +33,6 @@ func Init() {
 	if errPing := DB.DB().Ping(); errPing != nil {
 		log.Fatal(errPing)
 	}
+	
 	fmt.Println("Successfully connected to database!")
 }
