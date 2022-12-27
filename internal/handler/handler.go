@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/koolsudeep/go_patient_account/internal/database"
 	"github.com/koolsudeep/go_patient_account/internal/model"
+	"net/http"
 )
 
 type HelloWorldHandler struct{}
@@ -20,7 +21,7 @@ func (h *PatientAccountHandler) GetPatientAccounts(c *gin.Context) {
 		c.AbortWithStatus(404)
 		return
 	}
-	c.JSON(200, patientAccounts)
+	c.JSON(http.StatusOK, patientAccounts)
 }
 
 func (h *PatientAccountHandler) GetPatientAccount(c *gin.Context) {
@@ -30,17 +31,22 @@ func (h *PatientAccountHandler) GetPatientAccount(c *gin.Context) {
 		c.AbortWithStatus(404)
 		return
 	}
-	c.JSON(200, patientAccount)
+	c.JSON(http.StatusOK, patientAccount)
 }
 
 func (h *PatientAccountHandler) CreatePatientAccount(c *gin.Context) {
 	var patientAccount model.PatientAccount
-	c.BindJSON(&patientAccount)
-	if err := database.DB.Create(&patientAccount).Error; err != nil {
-		c.AbortWithStatus(400)
+	if err := c.ShouldBindJSON(&patientAccount); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(201, patientAccount)
+
+	if err := database.DB.Create(&patientAccount).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, patientAccount)
 }
 
 func (h *PatientAccountHandler) UpdatePatientAccount(c *gin.Context) {
@@ -50,7 +56,10 @@ func (h *PatientAccountHandler) UpdatePatientAccount(c *gin.Context) {
 		c.AbortWithStatus(404)
 		return
 	}
-	c.BindJSON(&patientAccount)
+	err := c.BindJSON(&patientAccount)
+	if err != nil {
+		return
+	}
 	if err := database.DB.Save(&patientAccount).Error; err != nil {
 		c.AbortWithStatus(400)
 		return

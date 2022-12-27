@@ -1,12 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/koolsudeep/go_patient_account/internal/database"
 	"github.com/koolsudeep/go_patient_account/internal/model"
+	"github.com/koolsudeep/go_patient_account/internal/router"
 	"log"
 
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/koolsudeep/go_patient_account/internal/app"
 )
@@ -27,6 +28,10 @@ func main() {
 	}
 
 	fmt.Println(string(patientAccountJSON))
+
+	handler := &app.Handler{DB: database.DB}
+	router.SetupPatientAccountRoutes(r, handler)
+
 	database.Init()
 	r := gin.Default()
 	app.SetupRoutes(r)
