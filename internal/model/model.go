@@ -11,3 +11,8 @@ type PatientAccount struct {
 	Phone   string
 	Address string
 }
+
+// Set the table name to "patient_accounts"
+func (PatientAccount) TableName() string {
+	return "patient_account"
+}
